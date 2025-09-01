@@ -1,0 +1,65 @@
+{
+  "projectType": "design-system",
+  "framework": "React",
+  "language": "TypeScript",
+  "styling": "Tailwind CSS",
+  "workflows": {
+    "component-generation": {
+      "description": "Generate React components from Figma designs",
+      "trigger": "Figma URL + Component Name",
+      "mcpServer": "figma-server",
+      "mcpServerPath": "design-system/mcp-servers/figma-server/",
+      "guidelines": "docs/COMPONENT_GUIDELINES.md",
+      "outputDirectory": "src/components/",
+      "requiredFiles": [
+        "ComponentName.tsx",
+        "ComponentName.stories.tsx", 
+        "ComponentName.test.tsx",
+        "index.ts"
+      ],
+      "autoActions": [
+        "Extract design data via MCP Figma server",
+        "Analyze responsive variants (desktop/mobile)",
+        "Generate TypeScript interfaces from text layers",
+        "Create accessibility-compliant components",
+        "Generate comprehensive tests and stories",
+        "Place in appropriate component directory"
+      ]
+    }
+  },
+  "mcpServers": {
+    "figma-server": {
+      "path": "design-system/mcp-servers/figma-server/index.js",
+      "tools": ["get_figma_selection", "get_design_tokens"],
+      "requiredEnv": ["FIGMA_TOKEN"]
+    }
+  },
+  "designSystem": {
+    "breakpoints": {
+      "xs": "375px",
+      "sm": "640px", 
+      "md": "768px",
+      "lg": "1024px",
+      "xl": "1280px"
+    },
+    "componentCategories": {
+      "ui": "src/components/ui/",
+      "layout": "src/components/layout/"
+    },
+    "designTokens": "design-tokens/",
+    "testingFramework": "Jest + Testing Library + jest-axe"
+  },
+  "codeStandards": {
+    "accessibility": "WCAG 2.1 AA",
+    "typescript": "strict mode with comprehensive interfaces",
+    "responsive": "mobile-first approach",
+    "testing": "unit tests + accessibility tests + visual tests"
+  },
+  "automaticBehaviors": {
+    "onFigmaUrl": "Extract design data and generate complete component",
+    "followGuidelines": true,
+    "generateTests": true,
+    "createStories": true,
+    "checkAccessibility": true
+  }
+}

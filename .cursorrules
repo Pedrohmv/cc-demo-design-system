@@ -1,0 +1,34 @@
+# Cursor Rules for Design System Component Generation
+
+## Project Context
+This is a React TypeScript design system that generates components from Figma designs using MCP servers.
+
+## Figma Component Generation Workflow
+When user provides a Figma URL + component name, automatically:
+
+1. **Extract Design Data**: Use the MCP Figma server at `design-system/mcp-servers/figma-server/`
+2. **Follow Guidelines**: Apply standards from `docs/COMPONENT_GUIDELINES.md`
+3. **Generate Complete Component**: Create all 4 required files
+4. **Correct Placement**: Save in `src/components/ui/` or `src/components/layout/`
+
+## Required Files to Generate
+- `ComponentName.tsx` - Main component with TypeScript interface
+- `ComponentName.stories.tsx` - Storybook stories showing all variants  
+- `ComponentName.test.tsx` - Jest + accessibility tests
+- `index.ts` - Export file
+
+## Standards
+- **TypeScript**: Comprehensive interfaces with JSDoc comments
+- **Accessibility**: WCAG compliance, ARIA attributes, semantic HTML
+- **Responsive**: Mobile-first using Tailwind breakpoints (xs:375px, sm:640px, md:768px, lg:1024px, xl:1280px)
+- **Testing**: Jest + Testing Library + jest-axe for accessibility
+- **Design Tokens**: Extract and use Figma colors, spacing, typography
+
+## MCP Server Usage
+- Server path: `design-system/mcp-servers/figma-server/index.js`
+- Tools: `get_figma_selection`, `get_design_tokens`
+- Required env: `FIGMA_TOKEN`
+
+## Example Usage
+User: "Generate PaymentCard from https://www.figma.com/file/abc123?node-id=1:2,1:3"
+→ Extract design data via MCP → Generate complete component following guidelines
