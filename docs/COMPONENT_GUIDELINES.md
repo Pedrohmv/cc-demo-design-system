@@ -1,24 +1,36 @@
-# Component Generation Guidelines for Claude Code
+# Component Generation Guidelines with Figma MCP Integration
 
 ## Overview
-This document provides guidelines for Claude Code when generating React components from Figma designs via MCP server data. These guidelines ensure consistent, accessible, and maintainable component generation.
+This document provides guidelines for Claude Code when generating React components directly from Figma selections using MCP (Model Context Protocol) integration. These guidelines ensure design-to-code consistency and proper design system integration.
 
 ## Core Principles
 
-### 1. **TypeScript First**
+### 1. **Figma-First Design Token Extraction**
+**ALWAYS follow this sequence before component generation:**
+1. Extract Figma variables using `mcp__figma-dev-mode-mcp-server__get_variable_defs`
+2. Update design system tokens in `/design-tokens/`
+3. Use design tokens in component instead of hardcoded values
+
+### 2. **Design System Token Usage**
+- Import tokens from `/design-tokens/colors.ts`, `/design-tokens/typography.ts`, `/design-tokens/spacing.ts`
+- Use `colors['primary-green-darkest']` instead of `#2D5F3A`
+- Apply typography tokens instead of hardcoded font styles
+- Reference spacing tokens for consistent margins/padding
+
+### 3. **TypeScript First**
 - Always generate comprehensive TypeScript interfaces
 - Use proper type unions for variants (3+ options) or boolean props (2 options)
 - Include JSDoc comments for complex props
 - Export both the component and its props interface
 
-### 2. **Accessibility by Default**
+### 4. **Accessibility by Default**
 - Generate semantic HTML elements (`button`, `nav`, `main`, etc.)
 - Include appropriate ARIA attributes (`aria-label`, `aria-describedby`, `role`)
 - Ensure proper keyboard navigation support
 - Add focus management for interactive components
 - Include screen reader considerations
 
-### 3. **Mobile-First Responsive Design**
+### 5. **Mobile-First Responsive Design**
 Use predefined breakpoints:
 ```typescript
 // Tailwind breakpoints to use
@@ -29,17 +41,13 @@ lg: 1024px  // Desktop
 xl: 1280px  // Large desktop
 ```
 
-### 4. **Design Token Integration**
-- Extract colors, spacing, typography from MCP data
-- Use existing design tokens when available
-- Create new tokens in `/design-tokens/` if needed
-- Prefer Tailwind classes over custom CSS
-
 ## Component Structure Template
 
 ```typescript
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { colors } from '../../../design-tokens/colors';
+import { typography } from '../../../design-tokens/typography';
 
 export interface ComponentNameProps {
   // Required props first
@@ -132,34 +140,70 @@ ComponentName.displayName = 'ComponentName';
 export default ComponentName;
 ```
 
-## MCP Data Interpretation Guidelines
+## Figma MCP Integration Workflow
 
-### 1. **Text Layer Analysis**
-From MCP `textLayers` data, determine:
-- **Headings**: Generate `title`, `heading`, `label` props
-- **Body text**: Generate `description`, `content`, `children` props  
-- **Interactive text**: Generate `buttonText`, `linkText`, `ctaText` props
-- **Placeholder text**: Generate `placeholder` props for inputs
+### Step 1: Extract Design Tokens
+**Before generating any component:**
+```typescript
+// 1. Get Figma variables
+const variables = await mcp__figma-dev-mode-mcp-server__get_variable_defs();
 
-### 2. **Responsive Variant Handling**
-From MCP `responsive` data:
-- Use `desktop` variant for default styles
-- Apply `mobile` variant with Tailwind responsive prefixes
-- Generate breakpoint-specific layouts when needed
+// 2. Update design-tokens files
+// Example variables returned:
+// {
+//   "Primary/Green/Darkest": "#2D5F3A",
+//   "Caption/Base/Large/Bold": "Font(family: \"DM Sans\", style: Bold, size: 14, weight: 700, lineHeight: 1.4)"
+// }
+```
 
-### 3. **Design Token Extraction**
-From MCP `designTokens`:
-- Map colors to Tailwind color classes
-- Convert spacing to Tailwind spacing scale
-- Apply typography styles as Tailwind text classes
-- Create CSS variables for unique values
+### Step 2: Update Design System
+**Add new tokens to appropriate files:**
+```typescript
+// design-tokens/colors.ts
+export const colors = {
+  // ... existing colors
+  'primary-green-darkest': '#2D5F3A', // From Figma
+} as const;
 
-### 4. **Interactive Behavior**
-From MCP `interactions` and component analysis:
-- **Buttons**: Add click handlers, loading states, disabled states
-- **Forms**: Add validation, error states, submission handling
-- **Navigation**: Add keyboard navigation, focus management
-- **Cards**: Add hover effects, click-to-expand behavior
+// design-tokens/typography.ts
+export const typography = {
+  'caption-base-large-bold': {
+    fontFamily: '"DM Sans"',
+    fontWeight: '700',
+    fontSize: '14px',
+    lineHeight: '1.4'
+  },
+} as const;
+```
+
+### Step 3: Generate Component with Tokens
+**Use design system tokens instead of hardcoded values:**
+```typescript
+// ❌ Don't do this:
+<div className="text-[#2d5f3a]">
+
+// ✅ Do this instead:
+<div style={{ color: colors['primary-green-darkest'] }}>
+
+// Or with Tailwind custom colors:
+<div className="text-primary-green-darkest">
+```
+
+### Step 4: MCP Data Interpretation
+
+#### From `get_variable_defs`:
+- Extract colors, fonts, spacing values
+- Map to design system token structure
+- Update design-tokens files
+
+#### From `get_code`:
+- Get component structure and styling
+- Replace hardcoded values with design tokens
+- Maintain original design fidelity
+
+#### From `get_image`:
+- Use for visual reference and documentation
+- Include in Storybook for design comparison
 
 ## Component Categories
 

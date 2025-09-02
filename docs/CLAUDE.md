@@ -1,21 +1,23 @@
-# Design System Component Generator with Claude Code
+# Design System with Figma MCP Integration
 
 ## Project Overview
-This project automatically generates sophisticated React TypeScript components from Figma designs using MCP servers for data extraction and Claude Code for intelligent component generation.
+This project uses **Figma MCP (Model Context Protocol) server** integration with Claude Code to extract design tokens and generate React TypeScript components directly from Figma selections, ensuring perfect design-to-code synchronization.
 
 ## Architecture
-- **Figma MCP Server**: Extracts comprehensive design data from Figma selections
-- **Claude Code Integration**: Interprets design intent and generates sophisticated components  
-- **Design System Output**: AI-generated components with proper TypeScript interfaces, accessibility, and responsive design
+- **Direct Figma MCP Integration**: Real-time extraction from Figma selections using Claude Code's built-in MCP tools
+- **Design Token Synchronization**: Automatic extraction and updating of design system tokens
+- **Intelligent Component Generation**: AI-powered component creation with proper TypeScript interfaces and accessibility
+- **Design System Consistency**: All components use centralized design tokens from Figma
 
 ## Key Principles
+- **Figma-First Design Tokens**: Always extract variables/tokens from Figma before code generation
+- **Design System Token Usage**: Components must use tokens from `/design-tokens/` directory
 - **Mobile-first responsive design** (xs: 375px, sm: 640px, md: 768px, lg: 1024px, xl: 1280px)
 - **React + TypeScript + Tailwind CSS** stack
 - **All text content as props** (backend-driven architecture)
 - **Semantic HTML with full accessibility** (ARIA attributes, proper roles)
 - **Boolean props for 2 variants, union types for 3+**
-- **Design token extraction** from Figma styles
-- **Intelligent component structure** based on design patterns
+- **Token-driven styling** instead of hardcoded values
 
 ## File Locations
 - **Generated components**: `/src/components/ui/`, `/src/components/layout/`
@@ -23,28 +25,36 @@ This project automatically generates sophisticated React TypeScript components f
 - **MCP Servers**: `/design-system/mcp-servers/`
 - **Configuration**: `.claude-config.json`, `package.json` (claude section)
 
-## How Claude Code Should Generate Components
+## Figma MCP Workflow
 
-### Automatic Workflow
-When provided with a **Figma URL** and **Component Name**, Claude Code should automatically:
+### Required Process for Component Generation
 
-1. **Extract Design Data**: Use the MCP Figma server to extract comprehensive design data
-2. **Follow Guidelines**: Apply standards from `/docs/COMPONENT_GUIDELINES.md` 
-3. **Generate Complete Component**: Create all 4 required files with production-ready code
-4. **Place Correctly**: Save in appropriate directory (`/src/components/ui/` or `/src/components/layout/`)
+**ALWAYS follow this sequence:**
 
-### Simple Usage Pattern
+1. **Extract Figma Variables**: Use `mcp__figma-dev-mode-mcp-server__get_variable_defs` to get design tokens
+2. **Update Design System**: Add/update tokens in `/design-tokens/colors.ts`, `/design-tokens/typography.ts`, `/design-tokens/spacing.ts`
+3. **Extract Component Code**: Use `mcp__figma-dev-mode-mcp-server__get_code` to get the component structure
+4. **Generate Token-Based Component**: Create component using design system tokens instead of hardcoded values
+
+### Direct Figma Selection Usage
 ```
-User: "Generate a PaymentCard component from https://www.figma.com/file/abc123?node-id=1:2,1:3"
+User: "Generate my current Figma selection as a HeaderInfo component"
 
 Claude Code automatically:
-- Calls MCP Figma server to extract design data
-- Analyzes responsive variants, text layers, design tokens
-- Generates PaymentCard.tsx with proper TypeScript interface
-- Creates comprehensive Storybook stories
-- Adds Jest + accessibility tests
-- Places files in /src/components/ui/PaymentCard/
+1. Calls mcp__figma-dev-mode-mcp-server__get_variable_defs (extract design tokens)
+2. Updates /design-tokens/ files with new Figma variables  
+3. Calls mcp__figma-dev-mode-mcp-server__get_code (get component structure)
+4. Generates HeaderInfo.tsx using design system tokens
+5. Creates comprehensive Storybook stories
+6. Adds proper imports from design-tokens
+7. Places files in /src/components/ui/HeaderInfo/
 ```
+
+### MCP Tools Available
+- `mcp__figma-dev-mode-mcp-server__get_code` - Extract component code from Figma selection
+- `mcp__figma-dev-mode-mcp-server__get_variable_defs` - Extract design variables/tokens
+- `mcp__figma-dev-mode-mcp-server__get_image` - Get visual representation
+- `mcp__figma-dev-mode-mcp-server__get_metadata` - Get structure metadata
 
 ### Expected Output Structure
 Claude Code should generate:
@@ -57,11 +67,13 @@ src/components/ui/ComponentName/
 ```
 
 ### Required Standards
+- **Design Token First**: ALWAYS extract Figma variables before generating components
+- **Token Usage**: Import and use design system tokens instead of hardcoded values
 - **TypeScript**: Comprehensive interfaces with JSDoc
 - **Accessibility**: WCAG compliance, ARIA attributes, semantic HTML
 - **Responsive**: Mobile-first using Tailwind breakpoints (xs:375px, sm:640px, md:768px, lg:1024px, xl:1280px)
 - **Testing**: Jest + Testing Library + jest-axe for accessibility
-- **Design Tokens**: Extract and use Figma colors, spacing, typography
+- **Figma Sync**: Components must stay in sync with Figma design tokens
 
 ## MCP Data Structure
 The Figma MCP server provides Claude with:
@@ -120,16 +132,19 @@ interface PaymentCardProps {
 
 ## Usage Examples
 
-### Generate Any Component Type
+### From Figma Selection (Recommended)
 ```bash
-# Simple button
-node scripts/claude-generate.js "https://www.figma.com/file/ABC123?node-id=1%3A2%2C1%3A3" "PrimaryButton"
+# Select component in Figma desktop app, then:
+"Generate my current Figma selection as a PrimaryButton component"
+"Create a PaymentCard component from my Figma selection"
+"Add HeaderInfo component from current selection"
+```
 
-# Complex card with multiple states
-node scripts/claude-generate.js "https://www.figma.com/file/ABC123?node-id=2%3A4%2C2%3A5" "PaymentCard"
-
-# Interactive form component  
-node scripts/claude-generate.js "https://www.figma.com/file/ABC123?node-id=3%3A6%2C3%3A7" "ContactForm"
+### From Figma URL (Alternative)
+```bash
+# Using specific node IDs
+"Generate component from https://figma.com/design/file?node-id=1-2"
+"Create Button from figma.com/file/abc123?node-id=1:2"
 ```
 
 ### Expected Output Structure
