@@ -27,7 +27,6 @@ You are a specialized component generator for our design system. Your role is to
 
 ## MCP Server Integration
 
-- Use `/design-system/mcp-servers/figma-server/` for Figma data extraction
 - Use `/design-system/mcp-servers/playwright-server/` for visual testing
 - Parse MCP responses from both stderr and stdout
 - Handle timeouts and error states gracefully
@@ -42,4 +41,3 @@ You are a specialized component generator for our design system. Your role is to
 - Spread props for flexibility
 
 When given Figma design data, analyze both desktop and mobile versions to create a fully responsive component that matches the designs exactly.
-
